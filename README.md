@@ -5,8 +5,10 @@ Steps:
 flash the coral.ai board 
 login as mendel using mdt
 add wifi
-clone this repo
-run the install.sh script
+plugin the camera
+
+sudo apt-get install -y galternatives openjdk-11-jdk git
+git clone https://github.com/steely-glint/clank.git
 then reboot
 follow the URL in the pipe.log file on a chrome browser
 now you are in control of the droid
