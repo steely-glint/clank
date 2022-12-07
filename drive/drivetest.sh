@@ -1,4 +1,6 @@
-#!/bin/sh -v
+#!/bin/sh 
+model=models/litrace.tflite 
+#model=models/Sept2022gs-edge.tflite
 pwml=/sys/class/pwm/pwmchip0/pwm0/duty_cycle
 if [ -d /sys/class/pwm/pwmchip1 ]; then
 	pwmr=/sys/class/pwm/pwmchip1/pwm0/duty_cycle
@@ -9,4 +11,5 @@ else
 	gpiol=/sys/class/gpio/gpio400/value
 	gpior=/sys/class/gpio/gpio424/value
 fi
-(cd ..; ./mendelcam --model models/litrace.tflite --labels models/steer.txt) | ./drive ${pwml} ${pwmr} ${gpiol} ${gpior}
+export model
+(cd ..; ./mendelcam --model ${model} --labels models/steer.txt) | ./drive ${pwml} ${pwmr} ${gpiol} ${gpior}

@@ -24,6 +24,9 @@ else
 	(echo out > gpio400/direction)
 	(echo out > gpio424/direction)
 fi
+if [ -b /dev/sda1 ]; then 
+    mount -o rw,users,uid=1000,gid=1000,dmask=007,fmask=117 /dev/sda1 /mnt
+fi
 
 
 
