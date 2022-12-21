@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script>
+    var facts= [];
+    function getTimestamp(act){
+        var ret =0;
+        if (act.name) {
+            var path = act.name.split("/");
+            if (path.length == 2){
+                var file = path[1].split(".");
+                if (file.length == 2 ){
+                    ret = parseInt(file[0]);
+                }
+            }
+        }
+        return ret;
+    }
+    function setDelta(acts){
+        for (var i=1;i<acts.length;i++){
+            var a0 = getTimestamp(acts[i-1]);
+            var a1 = getTimestamp(acts[i]);
+            acts[i-1].delta = a1 -a0;
+        }
+        acts[acts.length-1].delta =1000;
+    }
+    function foldShort(acts){
+        for (var i=0;i<acts.length-1;i++){
+            if(acts[i].delta < 50){
+                acts[i].flabel = acts[i+1].label;
+            } else {
+                acts[i].flabel = acts[i].label;
+            }
+        }
+        acts[acts.length-1].flabel = acts[acts.length-1].label;
+    }
+    function forwardZeros(acts){
+        for (var i=0;i<acts.length-2;i++){
+            if(acts[i].flabel === "0:0"){
+                acts[i].flabel = acts[i+1].flabel;
+            }
+        }
+    }
+    function backZeros(acts){
+        for (var i=1;i<acts.length-1;i++){
+            if(acts[i].flabel === "0:0"){
+                acts[i].flabel = acts[i+1].flabel;
+            }
+        }
+    }
+    function last(acts){
+        var i = acts.length-1;
+        if (acts[i].flabel ==="0:0"){
+            acts[i].flabel = acts[i-1].flabel;
+        }
+    }
+    function displayActs(acts){
+
+        setDelta(acts);
+        foldShort(acts);
+        backZeros(acts);
+        forwardZeros(acts);
+        //forwardZeros(acts);
+        last(acts);
+        facts = acts;
+            var h = "";
+        q='"';
+        for (var i=0;i<acts.length;i++){
+            h+="<tr>\n";
+            h+="<td>";
+            h+="<img src="+q+acts[i].name+q+"</img>";
+            h+="</td>";
+            h+="<td>";
+            h+=acts[i].label;
+            h+="</td>";
+            h+="<td>";
+            h+=acts[i].delta;
+            h+="</td>";
+            h+="<td>";
+            h+=acts[i].flabel;
+            h+="</td>";
+            h+="</tr>\n";
+        }
+        var atable = document.getElementById("acts");
+        atable.innerHTML = h;
+    }
+    function loadActs(){
+        var xobj = new XMLHttpRequest();
+        xobj.overrideMimeType("application/json");
+        xobj.open('GET', "snaps/1670435668221.json", true);
+        xobj.onreadystatechange = function () {
+            if (xobj.readyState == 4 && xobj.status == "200") {
+
+                var data = JSON.parse(xobj.responseText);
+                if (data.acts.length > 0){
+                    displayActs(data.acts);
+                }else {
+                    console.log("Actions were " + JSON.stringify(data.acts));
+                }
+            }
+        };
+        xobj.send(null);
+    }
+    function spit(acts){
+        var csv="\n";
+        var prefix = "gs://cartonomouse-vcm/Dec2022-pizero-clank-track/images/"
+        for (var i=0;i<acts.length;i++){
+            n=acts[i].name.replace("snaps/",prefix);
+            csv+=n;
+            csv+=",";
+            csv+=acts[i].flabel;
+            csv+="\n";
+        }
+        console.log(csv);
+    }
+    window.onload = (event) => {
+        console.log('page is loaded');
+        loadActs();
+    };
+</script>
+<h1>Mangle</h1>
+<div onclick="spit(facts);">Spit it out</div>
+<table id="acts"></table>
+</body>
+</html>
