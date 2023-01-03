@@ -48,7 +48,7 @@
     function backZeros(acts){
         for (var i=1;i<acts.length-1;i++){
             if(acts[i].flabel === "0:0"){
-                acts[i].flabel = acts[i+1].flabel;
+                acts[i].flabel = acts[i-1].flabel;
             }
         }
     }
@@ -72,6 +72,7 @@
         for (var i=0;i<acts.length;i++){
             h+="<tr>\n";
             h+="<td>";
+            h+=acts[i].name;
             h+="<img src="+q+acts[i].name+q+"</img>";
             h+="</td>";
             h+="<td>";
@@ -91,7 +92,7 @@
     function loadActs(){
         var xobj = new XMLHttpRequest();
         xobj.overrideMimeType("application/json");
-        xobj.open('GET', "snaps/1670435668221.json", true);
+        xobj.open('GET', "snaps/1670439606198.json", true);
         xobj.onreadystatechange = function () {
             if (xobj.readyState == 4 && xobj.status == "200") {
 
@@ -107,9 +108,10 @@
     }
     function spit(acts){
         var csv="\n";
-        var prefix = "gs://cartonomouse-vcm/Dec2022-pizero-clank-track/images/"
+        //	gs://cartonomouse-vcm/dec-2022-run/imports/1670435743813.jpg
+        var prefix = "gs://cartonomouse-vcm/dec-2022-run/low/"
         for (var i=0;i<acts.length;i++){
-            n=acts[i].name.replace("snaps/",prefix);
+            var n=acts[i].name.replace("snaps/",prefix);
             csv+=n;
             csv+=",";
             csv+=acts[i].flabel;
